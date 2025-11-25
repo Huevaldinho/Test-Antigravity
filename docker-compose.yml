@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mcp-server:
+    build: ./mcp_server
+    container_name: bq-mcp-server
+    # We use 'stdin_open' and 'tty' to keep the container running if using stdio,
+    # but for MCP over Docker, we usually need a transport.
+    # For this POC, we'll keep it simple: The container runs the server.
+    # To interact with it, we might need to exec into it or use a network transport (SSE).
+    # Since the user asked for "Distributable", we'll assume they might want to run the client LOCALLY
+    # and talk to this container.
+    
+    # IMPORTANT: Mounting credentials
+    # Windows User: Update the source path to your gcloud config
+    # Usually: C:\Users\YOUR_USER\AppData\Roaming\gcloud
+    volumes:
+      - ${APPDATA}/gcloud:/root/.config/gcloud
+    
+    environment:
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+    
+    # Keep container alive for testing
+    command: ["python", "server.py"]
